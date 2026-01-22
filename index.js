@@ -1,0 +1,90 @@
+import {
+  Client,
+  GatewayIntentBits,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  ChannelType
+} from "discord.js";
+import "dotenv/config";
+
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+
+// ===== CONFIG =====
+const MAX_TOTAL = 99;
+const MAX_PER_RUN = 50;
+const CHANNEL_NAME = "ez";
+// ==================
+
+const commands = [
+  new SlashCommandBuilder()
+    .setName("createez")
+    .setDescription("Tạo tối đa 50 kênh ez và ping everyone (tổng tối đa 99)")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+].map(cmd => cmd.toJSON());
+
+const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
+
+(async () => {
+  try {
+    console.log("🔁 Đăng slash command...");
+    await rest.put(
+      Routes.applicationCommands(process.env.CLIENT_ID),
+      { body: commands }
+    );
+    console.log("✅ Xong!");
+  } catch (e) {
+    console.error(e);
+  }
+})();
+
+client.once("ready", () => {
+  console.log(`🤖 Online: ${client.user.tag}`);
+});
+
+client.on("interactionCreate", async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+  if (interaction.commandName !== "createez") return;
+
+  if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+    return interaction.reply({ content: "❌ Bạn không có quyền admin.", ephemeral: true });
+  }
+
+  const guild = interaction.guild;
+
+  const existing = guild.channels.cache.filter(
+    c => c.type === ChannelType.GuildText && c.name === CHANNEL_NAME
+  ).size;
+
+  if (existing >= MAX_TOTAL) {
+    return interaction.reply({
+      content: `❌ Đã có ${existing}/${MAX_TOTAL} kênh "${CHANNEL_NAME}". Không thể tạo thêm.`,
+      ephemeral: true
+    });
+  }
+
+  const canCreate = Math.min(MAX_PER_RUN, MAX_TOTAL - existing);
+
+  await interaction.reply({
+    content: `⏳ Đang tạo ${canCreate} kênh "${CHANNEL_NAME}"...`,
+    ephemeral: true
+  });
+
+  for (let i = 0; i < canCreate; i++) {
+    const ch = await guild.channels.create({
+      name: CHANNEL_NAME,
+      type: ChannelType.GuildText
+    });
+    await ch.send("@everyone 🚀 Kênh mới đã được tạo!");
+  }
+
+  await interaction.followUp({
+    content: `✅ Đã tạo ${canCreate} kênh "${CHANNEL_NAME}".`,
+    ephemeral: true
+  });
+});
+
+client.login(process.env.BOT_TOKEN);
