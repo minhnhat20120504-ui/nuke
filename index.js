@@ -14,15 +14,15 @@ const client = new Client({
 });
 
 // ===== CONFIG =====
-const MAX_TOTAL = 99;
-const MAX_PER_RUN = 50;
+const MAX_TOTAL = 500;
+const MAX_PER_RUN = 100;
 const CHANNEL_NAME = "ez";
 // ==================
 
 const commands = [
   new SlashCommandBuilder()
     .setName("createez")
-    .setDescription("Tạo tối đa 50 kênh ez và ping everyone (tổng tối đa 99)")
+    .setDescription("Tạo tối đa 100 kênh ez và ping everyone (tổng tối đa 500)")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 ].map(cmd => cmd.toJSON());
 
@@ -61,7 +61,7 @@ client.on("interactionCreate", async interaction => {
 
   if (existing >= MAX_TOTAL) {
     return interaction.reply({
-      content: `❌ Đã có ${existing}/${MAX_TOTAL} kênh "${CHANNEL_NAME}". Không thể tạo thêm.`,
+      content: `❌ Đã có ${existing}/${MAX_TOTAL} kênh "${CHANNEL_NAME}".`,
       ephemeral: true
     });
   }
@@ -69,20 +69,25 @@ client.on("interactionCreate", async interaction => {
   const canCreate = Math.min(MAX_PER_RUN, MAX_TOTAL - existing);
 
   await interaction.reply({
-    content: `⏳ Đang tạo ${canCreate} kênh "${CHANNEL_NAME}"...`,
+    content: `⚡ Đang tạo ${canCreate} kênh "${CHANNEL_NAME}"...`,
     ephemeral: true
   });
 
+  // ⚡ Tạo song song cho nhanh
+  const tasks = [];
   for (let i = 0; i < canCreate; i++) {
-    const ch = await guild.channels.create({
-      name: CHANNEL_NAME,
-      type: ChannelType.GuildText
-    });
-    await ch.send("@everyone 🚀 Kênh mới đã được tạo!");
+    tasks.push(
+      guild.channels.create({
+        name: CHANNEL_NAME,
+        type: ChannelType.GuildText
+      }).then(ch => ch.send("@everyone 🚀 Kênh mới!"))
+    );
   }
 
+  await Promise.all(tasks);
+
   await interaction.followUp({
-    content: `✅ Đã tạo ${canCreate} kênh "${CHANNEL_NAME}".`,
+    content: `✅ Đã tạo ${canCreate} kênh.`,
     ephemeral: true
   });
 });
