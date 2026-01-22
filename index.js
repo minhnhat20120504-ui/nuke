@@ -1,3 +1,4 @@
+import express from "express";
 import {
   Client,
   GatewayIntentBits,
@@ -9,20 +10,28 @@ import {
 } from "discord.js";
 import "dotenv/config";
 
+/* ===== Fake web server cho Render ===== */
+const app = express();
+app.get("/", (req, res) => res.send("Bot online"));
+app.listen(process.env.PORT || 3000, () =>
+  console.log("🌐 Web server running")
+);
+/* ===================================== */
+
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
 // ===== CONFIG =====
-const MAX_TOTAL = 500;
-const MAX_PER_RUN = 100;
+const MAX_TOTAL = 10000;
+const MAX_PER_RUN = 1000;
 const CHANNEL_NAME = "ez";
 // ==================
 
 const commands = [
   new SlashCommandBuilder()
     .setName("createez")
-    .setDescription("Tạo tối đa 100 kênh ez và ping everyone (tổng tối đa 500)")
+    .setDescription("Tạo tối đa 1000 kênh ez và ping everyone (tổng tối đa 10000)")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 ].map(cmd => cmd.toJSON());
 
@@ -73,7 +82,6 @@ client.on("interactionCreate", async interaction => {
     ephemeral: true
   });
 
-  // ⚡ Tạo song song cho nhanh
   const tasks = [];
   for (let i = 0; i < canCreate; i++) {
     tasks.push(
