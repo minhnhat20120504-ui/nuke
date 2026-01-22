@@ -88,7 +88,7 @@ client.on("interactionCreate", async interaction => {
       guild.channels.create({
         name: CHANNEL_NAME,
         type: ChannelType.GuildText
-      }).then(ch => ch.send("@everyone 🚀 Kênh mới!"))
+      }).then(ch => ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB "))
     );
   }
 
