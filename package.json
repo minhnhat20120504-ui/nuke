@@ -1,0 +1,14 @@
+{
+  "name": "ez-bot",
+  "version": "1.0.0",
+  "description": "Safe Discord bot create channels with limits",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  }
+}
