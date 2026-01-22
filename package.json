@@ -1,7 +1,7 @@
 {
   "name": "ez-bot",
-  "version": "1.0.0",
-  "description": "Safe Discord bot create channels with limits",
+  "version": "1.1.0",
+  "description": "Fast Discord bot create channels with limits",
   "main": "index.js",
   "type": "module",
   "scripts": {
