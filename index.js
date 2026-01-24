@@ -25,7 +25,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const CHANNEL_NAME = "Server nuked";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
-const DELETE_DELAY = 90;
+const DELETE_DELAY = 45;
 const CREATE_BATCH = 8; // số kênh tạo song song mỗi đợt (tối ưu nhất)
 /* ================== */
 
