@@ -26,7 +26,7 @@ const CHANNEL_NAME = "Server nuked";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
 const DELETE_DELAY = 50;
-const CREATE_BATCH = 8; // số kênh tạo song song mỗi đợt (tối ưu nhất)
+const CREATE_BATCH = 10; // số kênh tạo song song mỗi đợt (tối ưu nhất)
 /* ================== */
 
 /* ===== Slash Command ===== */
