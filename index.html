@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Bot by Guild ID</title>
+  <style>
+    body {
+      background: #0b0b0b;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #111;
+      padding: 25px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 0 20px rgba(0,0,0,.6);
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #5865f2;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #4752c4;
+    }
+    .result {
+      margin-top: 12px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🤖 Add Bot bằng Guild ID</h2>
+    <input id="guildId" placeholder="Nhập Guild ID..." />
+    <button onclick="gen()">Tạo link add bot</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function gen() {
+      const guildId = document.getElementById("guildId").value;
+      const res = await fetch("/oauth-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ guildId })
+      });
+
+      const data = await res.json();
+      document.getElementById("result").innerHTML =
+        `✅ <a href="${data.url}" target="_blank">${data.url}</a>`;
+    }
+  </script>
+</body>
+</html>
