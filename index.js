@@ -1,32 +1,75 @@
 import express from "express";
-import { ShardingManager } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  ChannelType
+} from "discord.js";
 import "dotenv/config";
 
+/* ===== GLOBAL CRASH SHIELD ===== */
+process.on("unhandledRejection", err => console.error("🔥 Promise:", err));
+process.on("uncaughtException", err => console.error("🔥 Exception:", err));
+/* ============================== */
+
+/* ===== EXPRESS SERVER ===== */
 const app = express();
 app.use(express.json());
-app.use(express.static("public"));
 
-app.post("/oauth-link", (req, res) => {
-  const { guildId } = req.body;
-  if (!guildId) return res.status(400).json({ error: "Missing guildId" });
+app.get("/", (req, res) => {
+  res.send(`
+    <h2>Bot Online ✅</h2>
+    <form method="POST" action="/invite">
+      <input name="client_id" placeholder="Bot Client ID" required />
+      <button>Generate Invite</button>
+    </form>
+  `);
+});
 
-  const url = `https://discord.com/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=8&scope=bot&guild_id=${guildId}&disable_guild_select=true`;
-  res.json({ url });
+app.post("/invite", (req, res) => {
+  const { client_id } = req.body;
+  const url = `https://discord.com/oauth2/authorize?client_id=${client_id}&scope=bot%20applications.commands&permissions=8`;
+  res.send(`<a href="${url}" target="_blank">👉 Add bot</a>`);
 });
 
 app.listen(process.env.PORT || 3000, () =>
-  console.log("🌐 Dashboard online")
+  console.log("🌐 Web server running")
 );
+/* ============================ */
 
-/* ===== SHARDING ===== */
-const manager = new ShardingManager("./bot.js", {
-  token: process.env.BOT_TOKEN,
-  totalShards: "auto",
-  respawn: true
+/* ===== DISCORD CLIENT ===== */
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+/* ========================== */
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ===== Slash Command ===== */
+const commands = [
+  new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("Check bot")
+].map(cmd => cmd.toJSON());
+
+const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
+
+(async () => {
+  try {
+    await rest.put(
+      Routes.applicationCommands(process.env.CLIENT_ID),
+      { body: commands }
+    );
+    console.log("✅ Slash OK");
+  } catch (e) {
+    console.error(e);
+  }
+})();
+
+client.once("ready", () => {
+  console.log(`🤖 Online: ${client.user.tag}`);
 });
 
-manager.on("shardCreate", shard => {
-  console.log(`🚀 Shard ${shard.id} launched`);
-});
-
-manager.spawn();
+client.login(process.env.BOT_TOKEN);
