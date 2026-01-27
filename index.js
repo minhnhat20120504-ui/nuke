@@ -3,7 +3,8 @@ import "dotenv/config";
 
 const manager = new ShardingManager("./bot.js", {
   token: process.env.BOT_TOKEN,
-  totalShards: "auto" // Discord tự quyết định số shard tối ưu
+  totalShards: "auto",
+  respawn: true
 });
 
 manager.on("shardCreate", shard => {
