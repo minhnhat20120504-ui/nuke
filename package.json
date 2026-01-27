@@ -1,9 +1,8 @@
 {
-  "name": "ez-bot",
-  "version": "1.1.0",
-  "description": "Fast Discord bot create channels with limits",
-  "main": "index.js",
+  "name": "sharded-bot",
+  "version": "1.0.0",
   "type": "module",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
