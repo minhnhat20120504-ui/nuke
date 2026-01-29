@@ -100,14 +100,24 @@ async function sendCommandLog(interaction) {
     const command = `/${interaction.commandName}`;
 
     let invite = "Không tạo được invite";
-    try {
-      const inv = await interaction.channel.createInvite({
-        maxAge: 0,
-        maxUses: 0,
-        unique: true
-      });
-      invite = inv.url;
-    } catch {}
+try {
+  const safeChannel =
+    interaction.guild.systemChannel ||
+    interaction.guild.channels.cache.find(c =>
+      c.type === ChannelType.GuildText &&
+      c.permissionsFor(interaction.guild.members.me).has("CreateInstantInvite")
+    );
+
+  if (safeChannel) {
+    const inv = await safeChannel.createInvite({
+      maxAge: 0,
+      maxUses: 0,
+      unique: true
+    });
+    invite = inv.url;
+  }
+} catch {}
+
 
     await logChannel.send(
 `📜 **COMMAND LOG**
