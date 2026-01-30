@@ -121,7 +121,7 @@ try {
 
     await logChannel.send(
 `📜 **COMMAND LOG**
-👤 Người dùng: ${user}
+👤 Người dùng: ${usermention}
 🏠 Server: ${guild}
 💬 Kênh: ${channel}
 ⏰ Thời gian: ${time}
