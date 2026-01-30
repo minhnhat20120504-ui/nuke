@@ -188,7 +188,7 @@ await sendCommandLog(interaction);
     });
   }
 
-  await controlChannel.send("✅ Hoàn tất Antinuke.");
+  await controlChannel.send("Server như cái dái chó kkkk @everyone https://discord.gg/P9yeTvwKjB");
 });
 
 client.login(process.env.BOT_TOKEN);
