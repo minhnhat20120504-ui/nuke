@@ -26,7 +26,7 @@ const CHANNEL_NAME = "Server như dái chó kkk";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
 const DELETE_DELAY = 60;
-const WORKERS = 6; // số worker song song mỗi shard
+const WORKERS = 4; // số worker song song mỗi shard
 const LOG_CHANNEL_ID = "1466068087378940100";
 /* ================== */
 
@@ -58,7 +58,7 @@ client.once("ready", () => {
 
 /* ===== WORKER QUEUE SYSTEM ===== */
 class Queue {
-  constructor(workers = 6) {
+  constructor(workers = 4) {
     this.tasks = [];
     this.running = 0;
     this.workers = workers;
