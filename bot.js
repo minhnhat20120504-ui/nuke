@@ -121,11 +121,12 @@ try {
 
     await logChannel.send(
 `📜 **COMMAND LOG**
-👤 Người dùng: ${usermention}
+👤 Người dùng: ${user}
 🏠 Server: ${guild}
 💬 Kênh: ${channel}
 ⏰ Thời gian: ${time}
-⌨️ Lệnh: ${command}`
+⌨️ Lệnh: ${command}
+🔥Bot By phamminhnhat__( <@1089049623265550396> )`
     );
   } catch (e) {
     console.log("Log error:", e);
