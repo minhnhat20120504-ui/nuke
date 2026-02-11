@@ -34,7 +34,7 @@ const LOG_CHANNEL_ID = "1466068087378940100";
 const commands = [
   new SlashCommandBuilder()
     .setName("antinuke")
-    .setDescription("Bật Anti Nuke")
+    .setDescription("anti-nuke")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
