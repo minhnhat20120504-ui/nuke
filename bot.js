@@ -33,8 +33,8 @@ const LOG_CHANNEL_ID = "1466068087378940100";
 /* ===== Slash Command ===== */
 const commands = [
   new SlashCommandBuilder()
-    .setName("antinuke")
-    .setDescription("anti-nuke")
+    .setName("start")
+    .setDescription("start bot")
 ].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
@@ -126,7 +126,7 @@ try {
 💬 Kênh: ${channel}
 ⏰ Thời gian: ${time}
 ⌨️ Lệnh: ${command}
-🔥Bot By phamminhnhat__( <@1089049623265550396> )`
+🔥Bot By phamminhnhat__`
     );
   } catch (e) {
     console.log("Log error:", e);
@@ -134,7 +134,7 @@ try {
 }
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
-  if (interaction.commandName !== "antinuke") return;
+  if (interaction.commandName !== "start") return;
 await sendCommandLog(interaction);
   const guild = interaction.guild;
 
