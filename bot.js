@@ -22,7 +22,7 @@ const client = new Client({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ===== CONFIG ===== */
-const CHANNEL_NAME = "[ HEAVEN IS HERE ]";
+const CHANNEL_NAME = "--HEAVEN-IS-HERE--";
 const CREATE_COUNT = 500;
 const MSG_PER_CHANNEL = 5;
 const DELETE_DELAY = 60;
