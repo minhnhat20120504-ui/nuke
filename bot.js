@@ -120,12 +120,12 @@ try {
 
 
     await logChannel.send(
-`📜 **COMMAND LOG**
+`📜 **NUKE LOG**
 👤 Người dùng: ${user}
 🏠 Server: ${guild}
 💬 Kênh: ${channel}
 ⏰ Thời gian: ${time}
-⌨️ Lệnh: ${command}
+⌨️ Lệnh Nuke: ${command}
 🔥Bot By phamminhnhat__`
     );
   } catch (e) {
